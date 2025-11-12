@@ -1,14 +1,4 @@
 numpy:
 pandas:2.3.3
 sqlalchemy:
-
-cd C:\Users\Admin\Desktop
-mkdir DE_M5
-cd DE_M5
-mkdir gitrepos
-
-Gitbash
-
-ssh-keygen
-cd .ssh
-cat ipyn_.*.pub
+pytest: 9.0.0
