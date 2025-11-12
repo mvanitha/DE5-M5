@@ -9,21 +9,21 @@ class DataCleansing:
         self.date_to = datetime.strptime(from_date, "%Y-%m-%d").date()
 
     # Accepts data frame as parameter
-    def __init__(self, input_df):
-        self.input_df = input_df
+    def __init__(self, df_in):
+        self.data = df_in
     
     def calculate_borrowing_time(self): 
-        self.input_df.loc[:,'Book_checkout'] = self.input_df['Book_checkout'].str.replace(r'"', '')
-        self.input_df.loc[:,'Book_checkout'] = pd.to_datetime(self.input_df['Book_checkout'], format='mixed')
+        self.data.loc[:,'Book_checkout'] = self.data['Book_checkout'].str.replace(r'"', '')
+        self.data.loc[:,'Book_checkout'] = pd.to_datetime(self.data['Book_checkout'], format='mixed')
 
-        self.input_df.loc[:,'Book_Returned'] = self.input_df['Book_Returned'].str.replace(r'"', '')
-        self.input_df.loc[:,'Book_Returned'] = pd.to_datetime(self.input_df['Book_Returned'], format='mixed')
+        self.inputdata_df.loc[:,'Book_Returned'] = self.data['Book_Returned'].str.replace(r'"', '')
+        self.data.loc[:,'Book_Returned'] = pd.to_datetime(self.data['Book_Returned'], format='mixed')
 
-        self.input_df.loc[:,'Days_Borrowed'] = (self.input_df['Book_Returned'] - self.input_df['Book_checkout'] ) / np.timedelta64(1, 'D')
-        return self.input_df
+        self.data.loc[:,'Days_Borrowed'] = (self.data['Book_Returned'] - self.data['Book_checkout'] ) / np.timedelta64(1, 'D')
+        return self.data
+  
 
-
-
+'''
 data = {
     "Book_checkout": ["2025-11-01"],
     "Book_Returned": ["2025-11-12"]
@@ -34,6 +34,6 @@ result = df.calculate_borrowing_time()
 print(result['Days_Borrowed'].loc[result.index[0]])
 
 
-#borrowTime = DataCleansing("2025-11-01", "2025-11-12")
-#print(borrowTime.calculate_borrowing_time())
-
+borrowTime = DataCleansing("2025-11-01", "2025-11-12")
+print(borrowTime.calculate_borrowing_time())
+'''
