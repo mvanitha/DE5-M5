@@ -6,16 +6,14 @@ import argparse;
 
 # Read source data files
 
-in_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Data\\03_Library Systembook.csv"
-in_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Data\\03_Library SystemCustomers.csv"
+in_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Data\\03_Library Systembook.csv"
+in_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Data\\03_Library SystemCustomers.csv"
 
 from sqlalchemy import create_engine
 
 # Define the connection string to your MS SQL Server
 server = 'localhost'  
-database = 'QAETLStagingDB'
-username = 'python_app_usr'
-password = 'test123'
+database = 'QAAnalysis'
 
 # Create the connection string with Windows Authentication
 connection_string = f'mssql+pyodbc://@{server}/{database}?trusted_connection=yes&driver=ODBC+Driver+17+for+SQL+Server'
@@ -47,8 +45,13 @@ def remove_missing_rows(data):
     return data.dropna(axis=0)
 
 # Remove duplicates
-def remove_duplicates(filename, data):
-        return data.drop_duplicates()
+def remove_duplicates(filesource, data):
+        if filesource == "Customer":
+            return data.drop_duplicates(subset=['Customer_ID'], keep='last')
+        elif filesource == "Book":
+            return data.drop_duplicates(subset=['Id'], keep='last')
+        else:
+            return data.drop_duplicates()
     
 def convert_date_datatypes(data):
     #  Convert string to date
@@ -71,6 +74,7 @@ def calculate_borrowing_time(data):
 if __name__ == "__main__":
 
     dropCount = 0
+    totalCount = 0
 
     parser = argparse.ArgumentParser()  
     parser.add_argument("--datasource", type=str, help="Input datasource such as Customer, Book, etc")  
@@ -87,17 +91,46 @@ if __name__ == "__main__":
     df_data.columns = format_df_headers(df_data)
 
     print(f"Count of Rows in {args.datasource} file:{len(df_data)}")
+    totalCount = len(df_data)
+
+    # Write original data to table
+    original_table_name = args.datasource + "Orig"
+    df_data.to_sql(original_table_name, con=engine, if_exists='replace', index=False)
+    data_log = {
+         'LoadName' :  original_table_name
+       , 'LoadCount':  totalCount
+    }
+    df_log = pd.DataFrame([data_log])
+    df_log.to_sql('AuditLog', con=engine, if_exists='append', index=False)
+
     
     # Drop Rows from file with missing data
     df_data = remove_missing_rows(df_data)    
     print(f"Count of Rows in {args.datasource} file after dropping missing rows:{len(df_data)}")
 
-    df_data = remove_duplicates({args.datasource}, df_data)
+    dl_row = {
+         'DataSource' : args.datasource
+       , 'DataCheck': "Missing Rows"
+       , 'DataCount': (totalCount - len(df_data))
+    }
+    df_dl = pd.DataFrame([dl_row])
+    df_dl.to_sql('DataAnalysis', con=engine, if_exists='append', index=False)
+
+
+    df_data = remove_duplicates(args.datasource, df_data)
     print(f"Count of Rows in {args.datasource} file after removing duplicates:{len(df_data)}")
    
-    if {args.datasource} == 'Book':       
+    dl_row = {
+         'DataSource' : args.datasource
+       , 'DataCheck': "Duplicates"
+       , 'DataCount': (totalCount - len(df_data))
+    }
+    df_dl = pd.DataFrame([dl_row])
+    df_dl.to_sql('DataAnalysis', con=engine, if_exists='append', index=False)
+    
+    if (args.datasource == 'Book'):       
        try:
-        df_data = convert_date_datatypes(df_data)
+            df_data = convert_date_datatypes(df_data)
        except Exception as e:
             df_data.drop(16, inplace=True)
             dropCount += 1
@@ -105,12 +138,11 @@ if __name__ == "__main__":
        
        df_data = calculate_borrowing_time(df_data) 
       
-
-    # Write the DataFrame to SQL Server
-
-    df_data.to_sql(args.datasource, con=engine, if_exists='replace', index=False)
+    # Write transformed data to table
+    transformed_table_name = args.datasource + "Transformed"
+    df_data.to_sql(transformed_table_name, con=engine, if_exists='replace', index=False)
     data_log = {
-         'LoadName' :  args.datasource
+         'LoadName' :  transformed_table_name
        , 'LoadCount':  len(df_data)
     }
 

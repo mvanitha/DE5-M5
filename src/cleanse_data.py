@@ -5,19 +5,17 @@ import pyodbc;
 
 # Read source data files
 
-in_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Data\\03_Library Systembook.csv"
-in_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Data\\03_Library SystemCustomers.csv"
+in_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Data\\03_Library Systembook.csv"
+in_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Data\\03_Library SystemCustomers.csv"
 
-out_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Analysis\\03_Library Systembook.csv"
-out_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5-20251110\\Analysis\\03_Library SystemCustomers.csv"
+out_systembooks_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Analysis\\03_Library Systembook.csv"
+out_systemcustomers_file = "C:\\Users\\Admin\\Desktop\\DE_M5\\gitrepos\\DE5-M5\\Analysis\\03_Library SystemCustomers.csv"
 
 from sqlalchemy import create_engine
 
 # Define the connection string to your MS SQL Server
 server = 'localhost'  
-database = 'QAETLStagingDB'
-username = 'python_app_usr'
-password = 'test123'
+database = 'QAAnalysis'
 
 # Create the connection string with Windows Authentication
 connection_string = f'mssql+pyodbc://@{server}/{database}?trusted_connection=yes&driver=ODBC+Driver+17+for+SQL+Server'
