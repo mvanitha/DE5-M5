@@ -1,0 +1,4 @@
+data_clean.py --datasource "Customer" --input_file "C:\Input\03_Library SystemCustomers.csv" --output_file "C:\Output\03_Library SystemCustomers.csv"
+
+
+ "Customer" ".\Input\03_Library SystemCustomers.csv" ".\Output\03_Library SystemCustomers.csv"
