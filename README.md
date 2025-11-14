@@ -23,7 +23,3 @@ Created a dashboard in Power BI reporting these metrics
 -- Anomalies per Data Source
 -- Customers per Books
 
-
-
-
-
