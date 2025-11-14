@@ -21,7 +21,7 @@ The python file performs the following tasks
 Created a dashboard in Power BI reporting these metrics
 -- Number of Delayed Borrowers
 -- Anomalies per Data Source
--- 
+-- Customers per Books
 
 
 
